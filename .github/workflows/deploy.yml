@@ -6,8 +6,8 @@ on:
       - deploy
 
 jobs:
-  build-and-push:
-    name: Build y Push a ECR
+  build-and-deploy:
+    name: Build, Push y Deploy
     runs-on: ubuntu-latest
 
     steps:
@@ -29,4 +29,21 @@ jobs:
         run: |
           docker build -t ${{ secrets.ECR_REGISTRY }}/${{ secrets.ECR_REPOSITORY }}:latest .
           docker push ${{ secrets.ECR_REGISTRY }}/${{ secrets.ECR_REPOSITORY }}:latest
-          echo "Imagen publicada: ${{ secrets.ECR_REGISTRY }}/${{ secrets.ECR_REPOSITORY }}:latest"
+
+      - name: Actualizar servicio ECS
+        run: |
+          aws ecs update-service \
+            --cluster cluster-innovatech-ep3 \
+            --service ${{ secrets.ECS_SERVICE }} \
+            --force-new-deployment \
+            --region ${{ secrets.AWS_REGION }}
+
+      - name: Esperar despliegue estable
+        run: |
+          aws ecs wait services-stable \
+            --cluster cluster-innovatech-ep3 \
+            --services ${{ secrets.ECS_SERVICE }} \
+            --region ${{ secrets.AWS_REGION }}
+
+      - name: Despliegue completado
+        run: echo "Servicio ${{ secrets.ECS_SERVICE }} desplegado correctamente"
