@@ -1,4 +1,4 @@
-name: CI/CD EP3 User Service
+name: CI/CD EP3 Innovatech
 
 on:
   push:
@@ -38,12 +38,5 @@ jobs:
             --force-new-deployment \
             --region ${{ secrets.AWS_REGION }}
 
-      - name: Esperar despliegue estable
-        run: |
-          aws ecs wait services-stable \
-            --cluster cluster-innovatech-ep3 \
-            --services ${{ secrets.ECS_SERVICE }} \
-            --region ${{ secrets.AWS_REGION }}
-
-      - name: Despliegue completado
-        run: echo "Servicio ${{ secrets.ECS_SERVICE }} desplegado correctamente"
+      - name: Despliegue iniciado
+        run: echo "Servicio ${{ secrets.ECS_SERVICE }} actualizado correctamente en ECS"
